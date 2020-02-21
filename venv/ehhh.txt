@@ -1,0 +1,22 @@
+P (<s> i want chinese food </s>)
+
+= P(i|<s>) * P(want|i) * P(chinese|want) * P(food|chinese) * P(</s>|food)
+
+=   0.25   *   0.33    *    0.0065       *      0.52       *     0.68
+
+=  				0.00027885
+
+__________________________________________________________________________
+
+=   0.19   *   0.21    *    0.0029       *      0.052      *     0.40
+
+=   			     0.000002406768
+
+The probability of "i want chinese food" after smoothing is less than before smoothing. 
+Because the probablity of n-grams in our training data is stolen to make up for words
+that might show up in the future. 
+
+<s> I am Sam </s>
+<s> Sam I am </s>
+<s> I am Sam </s>
+<s> I do not like green eggs and Sam </s>

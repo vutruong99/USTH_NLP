@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-
 def bigram_add_one():
     counts = defaultdict(int)
     context_counts = defaultdict(int)
@@ -19,9 +18,6 @@ def bigram_add_one():
 
     for ngram, count in counts.items():
         print(ngram + "\t" + "{}".format((counts[ngram]+1)/(context_counts[ngram.split()[0]] + len(context_counts))))
-
-
-
 
 def trigram_train():
     counts = defaultdict(int)
@@ -47,5 +43,63 @@ def trigram_train():
         context = ngram.split()[0:2]
         print(ngram + "\t" + "{}".format(counts[ngram] / context_counts[" ".join(context)]) + "\n")
 
+# ___________________________________________________________________________________________ #
+def write_zeroes():
+    with open("train_0.txt",'w') as fo:
+        for i in range(91):
+            fo.write("0 ")
+        for i in range(9):
+            fo.write(str(i+1) + " ")
 
-bigram_add_one()
+
+def train_unigram():
+    counts = defaultdict(int)
+    context_counts = defaultdict(int)
+    with open("train_0.txt") as f:
+        for line in f:
+            line = line.strip()
+            if line == '':
+                continue
+            words = line.split()
+
+
+            for i in range(0, len(words)):
+                counts[words[i]] += 1
+    with open("model_file_0.txt",'w') as fo:
+        for ngram, count in counts.items():
+            fo.write(ngram + "\t" + "{}\n".format(counts[ngram]/100))
+
+train_unigram()
+
+def load_bigram_model():
+    probs = {}
+    with open("model_file_0.txt", 'r') as f:
+        for line in f:
+            line = line.strip()
+            probs[line.split("\t")[0]] = float(line.split("\t")[1])
+            pass
+    return probs
+
+load_bigram_model()
+
+def test_zeroes(lambda1=0.95, N=1000000):
+    P = 1
+    W = 0
+
+    probs = load_bigram_model()
+
+    with open("test_0.txt",'r') as f:
+        for line in f:
+            line = line.strip()
+            if line == '':
+                continue
+            words = line.split()
+
+            for i in range(1, len(words)):
+                P = P * 1/probs.get(words[i])
+                W += 1
+            P = pow(P, 1/float(W))
+    print(P)
+
+test_zeroes()
+
