@@ -11,13 +11,41 @@ def bigram_add_one():
             words = line.split()
 
             for i in range(0,len(words)):
-                two_word_join = words[i] + " " + words[i-1]
+                two_word_join = words[i-1] + " " + words[i]
                 counts[two_word_join] += 1
                 context_counts[words[i]] +=1
                 pass
 
     for ngram, count in counts.items():
         print(ngram + "\t" + "{}".format((counts[ngram]+1)/(context_counts[ngram.split()[0]] + len(context_counts))))
+
+bigram_add_one()
+
+def lin_inter_smooth():
+    counts = defaultdict(int)
+    context_counts = defaultdict(int)
+    lamda1 = 0.5
+    lamda2 = 0.5
+    with open("venv\Iamsam2.txt") as f:
+        for line in f:
+            line = line.strip()
+            if line == '':
+                continue
+            words = line.split()
+
+            for i in range(0, len(words)):
+                two_word_join = words[i-1] + " " + words[i]
+                counts[two_word_join] += 1
+                counts[words[i]] +=1
+                context_counts[words[i]] += 1
+                pass
+
+    for ngram, count in counts.items():
+        if len(ngram.split()) > 1:
+            pbigram = counts[ngram]/context_counts[ngram.split()[0]]
+            punigram = counts[ngram.split()[1]]/len(context_counts)
+            print("pbigram of {} and  unigram of {} is {} and {}".format(ngram, ngram.split()[1],pbigram,punigram))
+            print("P of " + ngram + " {}".format(pbigram*lamda1 + lamda2*punigram))
 
 def trigram_train():
     counts = defaultdict(int)
@@ -43,14 +71,16 @@ def trigram_train():
         context = ngram.split()[0:2]
         print(ngram + "\t" + "{}".format(counts[ngram] / context_counts[" ".join(context)]) + "\n")
 
+lin_inter_smooth()
 # ___________________________________________________________________________________________ #
 def write_zeroes():
     with open("train_0.txt",'w') as fo:
         for i in range(91):
-            fo.write("0 ")
+            fo.write("0 \n ")
         for i in range(9):
             fo.write(str(i+1) + " ")
 
+write_zeroes()
 
 def train_unigram():
     counts = defaultdict(int)
@@ -69,7 +99,6 @@ def train_unigram():
         for ngram, count in counts.items():
             fo.write(ngram + "\t" + "{}\n".format(counts[ngram]/100))
 
-train_unigram()
 
 def load_bigram_model():
     probs = {}
@@ -79,8 +108,6 @@ def load_bigram_model():
             probs[line.split("\t")[0]] = float(line.split("\t")[1])
             pass
     return probs
-
-load_bigram_model()
 
 def test_zeroes(lambda1=0.95, N=1000000):
     P = 1
@@ -100,6 +127,4 @@ def test_zeroes(lambda1=0.95, N=1000000):
                 W += 1
             P = pow(P, 1/float(W))
     print(P)
-
-test_zeroes()
 
